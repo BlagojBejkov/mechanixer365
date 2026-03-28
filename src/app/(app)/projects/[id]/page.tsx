@@ -8,28 +8,12 @@ import { formatCurrency, formatDate, formatHours } from '@/lib/utils'
 import { getProject, getProjectStats } from '@/lib/db/queries'
 import { requireAuth } from '@/lib/auth'
 import {
-  CheckCircle2, Circle, Clock, AlertCircle,
-  FileDown, Plus, Timer, DollarSign, Users, Calendar, MoreHorizontal
+  FileDown, Plus, Timer, DollarSign, Users, Calendar
 } from 'lucide-react'
 import ProjectTaskManager from '@/components/projects/ProjectTaskManager'
 
 export const metadata: Metadata = { title: 'Project' }
 export const dynamic = 'force-dynamic'
-
-const MILESTONE_STATUS_CFG: Record<string, { color: string; label: string }> = {
-  completed:   { color: '#22C55E', label: 'Complete' },
-  in_progress: { color: '#3D8EF0', label: 'Active' },
-  pending:     { color: '#3A3A45', label: 'Upcoming' },
-}
-
-const TASK_STATUS_CFG: Record<string, { icon: any; color: string }> = {
-  done:        { icon: CheckCircle2, color: '#22C55E' },
-  completed:   { icon: CheckCircle2, color: '#22C55E' },
-  in_progress: { icon: Clock,        color: '#3D8EF0' },
-  review:      { icon: AlertCircle,  color: '#8B5CF6' },
-  todo:        { icon: Circle,       color: '#3A3A45' },
-  pending:     { icon: Circle,       color: '#3A3A45' },
-}
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAuth()
@@ -52,6 +36,22 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     : null
 
   const budgetColor = budgetPct > 95 ? 'red' as const : budgetPct > 80 ? 'amber' as const : 'green' as const
+
+  // Safely map milestones with proper types
+  const milestones = (project.milestones ?? []).map(m => ({
+    id: m.id,
+    name: m.name,
+    status: (m.status ?? 'pending') as string,
+    dueDate: m.dueDate,
+    tasks: (m.tasks ?? []).map(t => ({
+      id: t.id,
+      title: t.title,
+      status: (t.status ?? 'todo') as string,
+      estimatedHours: t.estimatedHours,
+      dueDate: t.dueDate,
+      assignedUser: t.assignedUser ? { id: t.assignedUser.id, name: t.assignedUser.name } : null,
+    })),
+  }))
 
   return (
     <div className="animate-in">
@@ -110,9 +110,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <p className="stat-number mb-1" style={{ color: daysLeft < 7 ? '#EF4444' : undefined }}>
                   {daysLeft < 0 ? `${Math.abs(daysLeft)}d over` : `${daysLeft}d`}
                 </p>
-                <p className="text-2xs text-mx-mid">
-                  {formatDate(project.endDate!, 'MMM d, yyyy')}
-                </p>
+                <p className="text-2xs text-mx-mid">{formatDate(project.endDate!, 'MMM d, yyyy')}</p>
               </>
             ) : (
               <p className="text-xs text-mx-subtle">No deadline set</p>
@@ -121,20 +119,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="grid grid-cols-3 gap-6">
-          {/* Tasks + milestones */}
+          {/* Tasks */}
           <div className="col-span-2">
-            <ProjectTaskManager
-              projectId={project.id}
-              milestones={(project.milestones ?? []).map(m => ({
-                ...m,
-                tasks: m.tasks ?? [],
-              }))}
-            />
+            <ProjectTaskManager projectId={project.id} milestones={milestones} />
           </div>
 
           {/* Sidebar */}
           <div className="space-y-4">
-            {/* Details */}
             <div className="card p-4 space-y-3">
               <p className="section-title">Details</p>
               <div className="space-y-2.5">
@@ -186,13 +177,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <p className="text-2xs text-mx-subtle py-2">No time logged yet.</p>
               ) : (
                 <div className="space-y-2">
-                  {(project.timeEntries ?? []).slice(0, 6).map(e => (
+                  {(project.timeEntries ?? []).slice(0, 6).map((e: any) => (
                     <div key={e.id} className="flex items-center gap-2">
-                      <div
-                        className="w-1 h-1 rounded-full flex-shrink-0"
-                        style={{ background: e.billable ? '#22C55E' : '#6B6B7A' }}
-                      />
-                      <Avatar name={e.user.name} size="sm" />
+                      <div className="w-1 h-1 rounded-full flex-shrink-0"
+                        style={{ background: e.billable ? '#22C55E' : '#6B6B7A' }} />
+                      <Avatar name={e.user?.name ?? '?'} size="sm" />
                       <div className="flex-1 min-w-0">
                         <p className="text-2xs text-mx-dim truncate">{e.description || 'No description'}</p>
                         <p className="text-2xs text-mx-subtle">{formatDate(e.date, 'MMM d')}</p>
@@ -214,7 +203,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <p className="text-2xs text-mx-subtle py-2">No files yet.</p>
               ) : (
                 <div className="space-y-1.5">
-                  {(project.files ?? []).map(f => (
+                  {(project.files ?? []).map((f: any) => (
                     <div key={f.id} className="flex items-center gap-2 p-2 rounded hover:bg-mx-muted cursor-pointer">
                       <FileDown size={12} className="text-mx-accent flex-shrink-0" />
                       <p className="text-2xs text-mx-light truncate flex-1">{f.name}</p>
