@@ -142,7 +142,7 @@ export default async function PortalPage({ params }: { params: Promise<{ clientI
                           </span>
                           {m.dueDate && (
                             <span className="font-mono text-2xs text-mx-subtle">
-                              {formatDate(new Date(m.dueDate), 'MMM d')}
+                              {formatDate(m.dueDate instanceof Date ? m.dueDate : new Date(Number(m.dueDate)), 'MMM d, yyyy')}
                             </span>
                           )}
                           {m.status === 'in_progress' && (
@@ -209,10 +209,10 @@ export default async function PortalPage({ params }: { params: Promise<{ clientI
                   <tr key={inv.id}>
                     <td className="font-mono text-xs text-mx-accent">{inv.number}</td>
                     <td className="font-mono text-xs text-mx-dim">
-                      {formatDate(new Date(inv.issueDate), 'MMM d, yyyy')}
+                      {formatDate(inv.issueDate instanceof Date ? inv.issueDate : new Date(Number(inv.issueDate)), 'MMM d, yyyy')}
                     </td>
                     <td className="font-mono text-xs text-mx-dim">
-                      {formatDate(new Date(inv.dueDate), 'MMM d, yyyy')}
+                      {formatDate(inv.dueDate instanceof Date ? inv.dueDate : new Date(Number(inv.dueDate)), 'MMM d, yyyy')}
                     </td>
                     <td className="font-mono font-semibold text-mx-light">
                       {formatCurrency(inv.total)}
