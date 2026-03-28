@@ -36,6 +36,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const { id } = await params
   const project = await getProject(id)
   if (!project) notFound()
+
   const stats = await getProjectStats(id)
 
   const progress = stats.totalTasks > 0
