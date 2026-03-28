@@ -8,8 +8,9 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 import { FileDown, CheckCircle2, Clock, Receipt, MessageSquare } from 'lucide-react'
 import { getPortalData } from '@/lib/db/queries'
 
-export async function generateMetadata({ params }: { params: { clientId: string } }): Promise<Metadata> {
-  const data = await getPortalData(params.clientId)
+export async function generateMetadata({ params }: { params: Promise<{ clientId: string }> }): Promise<Metadata> {
+  const { clientId } = await params
+  const data = await getPortalData(clientId)
   return { title: data ? `${data.companyName} · Client Portal` : 'Client Portal' }
 }
 
@@ -23,8 +24,8 @@ function getInitials(name: string) {
   return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)
 }
 
-export default async function PortalPage({ params }: { params: { clientId: string } }) {
-  const { clientId } = params
+export default async function PortalPage({ params }: { params: Promise<{ clientId: string }> }) {
+  const { clientId } = await params
 
   // ── Auth check ──────────────────────────────────────────
   const cookieStore = await cookies()

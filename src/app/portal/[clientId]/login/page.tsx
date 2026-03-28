@@ -2,24 +2,31 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function PortalLoginPage({ params }: { params: { clientId: string } }) {
+export default function PortalLoginPage({ params }: { params: Promise<{ clientId: string }> }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [clientId, setClientId] = useState<string>('')
   const router = useRouter()
+
+  // Unwrap async params in Next.js 15
+  useState(() => {
+    Promise.resolve(params).then(p => setClientId(p.clientId))
+  })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!clientId) return
     setLoading(true)
     setError('')
     const res = await fetch(`/api/portal/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId: params.clientId, password }),
+      body: JSON.stringify({ clientId, password }),
     })
     const data = await res.json()
     if (res.ok && data.ok) {
-      router.push(`/portal/${params.clientId}`)
+      router.push(`/portal/${clientId}`)
       router.refresh()
     } else {
       setError(data.error ?? 'Invalid password')
