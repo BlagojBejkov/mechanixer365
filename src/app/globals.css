@@ -1,0 +1,340 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Syne', system-ui;
+  --font-body: 'DM Sans', system-ui;
+  --font-mono: 'DM Mono', monospace;
+}
+
+/* ─── Base ───────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  background-color: #0A0A0B;
+  color: #C8C8D4;
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* ─── Scrollbars ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2A32;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A45;
+}
+
+/* ─── Focus ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 1px solid #3D8EF0;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Selection ──────────────────────────────────────── */
+::selection {
+  background-color: rgba(61, 142, 240, 0.25);
+  color: #F0F0F5;
+}
+
+/* ─── Typography ─────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #F0F0F5;
+}
+
+.font-display { font-family: var(--font-display); }
+.font-mono    { font-family: var(--font-mono); }
+
+/* ─── Components ─────────────────────────────────────── */
+
+/* Surface cards */
+.card {
+  background: #16161A;
+  border: 1px solid #2A2A32;
+  border-radius: 8px;
+}
+
+.card-elevated {
+  background: #1E1E24;
+  border: 1px solid #2A2A32;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Stat number */
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #F0F0F5;
+}
+
+/* Status badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Table */
+.mx-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mx-table thead tr {
+  border-bottom: 1px solid #2A2A32;
+}
+
+.mx-table thead th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6B6B7A;
+}
+
+.mx-table tbody tr {
+  border-bottom: 1px solid #1E1E24;
+  transition: background 0.1s;
+  cursor: pointer;
+}
+
+.mx-table tbody tr:hover {
+  background: #1E1E24;
+}
+
+.mx-table tbody td {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #C8C8D4;
+}
+
+/* Input */
+.mx-input {
+  width: 100%;
+  background: #111114;
+  border: 1px solid #2A2A32;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: #F0F0F5;
+  transition: border-color 0.15s;
+}
+
+.mx-input:focus {
+  outline: none;
+  border-color: #3D8EF0;
+}
+
+.mx-input::placeholder {
+  color: #3A3A45;
+}
+
+/* Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.btn-primary {
+  background: #3D8EF0;
+  color: #fff;
+}
+.btn-primary:hover { background: #5BA3F5; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-ghost {
+  background: transparent;
+  color: #9494A3;
+  border: 1px solid #2A2A32;
+}
+.btn-ghost:hover {
+  background: #1E1E24;
+  color: #C8C8D4;
+  border-color: #3A3A45;
+}
+
+.btn-danger {
+  background: #EF444415;
+  color: #EF4444;
+  border: 1px solid #EF444430;
+}
+.btn-danger:hover { background: #EF444425; }
+
+/* Sidebar nav */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6B6B7A;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.nav-item:hover {
+  background: #1E1E24;
+  color: #C8C8D4;
+}
+
+.nav-item.active {
+  background: #1E1E24;
+  color: #F0F0F5;
+}
+
+.nav-item.active svg {
+  color: #3D8EF0;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 3px;
+  background: #2A2A32;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: #3D8EF0;
+  transition: width 0.3s ease;
+}
+
+/* Time tracker */
+.time-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22C55E;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Section header */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6B6B7A;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #1E1E24;
+  margin: 16px 0;
+}
+
+/* Glow accent line */
+.accent-bar {
+  height: 1px;
+  background: linear-gradient(90deg, #3D8EF060 0%, #3D8EF0 50%, #3D8EF060 100%);
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #3A3A45;
+}
+
+.empty-state svg {
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+/* Tooltip */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1E1E24;
+  color: #C8C8D4;
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #2A2A32;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
