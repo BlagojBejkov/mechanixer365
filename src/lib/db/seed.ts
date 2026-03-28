@@ -4,6 +4,8 @@
  */
 import { db } from './index'
 import { users, clients, projects, milestones } from './schema'
+import { config } from 'dotenv'
+config({ path: '.env.local' })
 
 async function seed() {
   console.log('🌱 Seeding Mechanixer 365...')
