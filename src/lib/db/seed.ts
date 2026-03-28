@@ -2,10 +2,10 @@
  * Run once: npx tsx src/lib/db/seed.ts
  * Seeds team users and minimal sample data.
  */
-import { db } from './index'
-import { users, clients, projects, milestones } from './schema'
 import { config } from 'dotenv'
 config({ path: '.env.local' })
+import { db } from './index'
+import { users, clients, projects, milestones } from './schema'
 
 async function seed() {
   console.log('🌱 Seeding Mechanixer 365...')

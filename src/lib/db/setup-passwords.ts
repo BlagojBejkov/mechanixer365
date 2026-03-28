@@ -4,12 +4,12 @@
  *
  * Change the passwords below before running!
  */
+import { config } from 'dotenv'
+config({ path: '.env.local' })
 import { db } from './index'
 import { users } from './schema'
 import { hashPassword } from '../auth'
 import { eq } from 'drizzle-orm'
-import { config } from 'dotenv'
-config({ path: '.env.local' })
 
 // ── SET YOUR PASSWORDS HERE ──────────────────────────
 const PASSWORDS: Record<string, string> = {
