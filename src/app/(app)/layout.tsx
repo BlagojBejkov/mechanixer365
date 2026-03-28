@@ -4,12 +4,14 @@ import AppShell from '@/components/layout/AppShell'
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAuth()
 
+  const user = session?.user ? {
+    name:  session.user.name,
+    email: session.user.email,
+    role:  session.user.role,
+  } : { name: 'Mechanixer', email: '', role: 'owner' }
+
   return (
-    <AppShell user={{
-      name:  session.user.name,
-      email: session.user.email,
-      role:  session.user.role,
-    }}>
+    <AppShell user={user}>
       {children}
     </AppShell>
   )
