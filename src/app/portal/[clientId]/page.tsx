@@ -27,7 +27,7 @@ export default async function PortalPage({ params }: { params: { clientId: strin
   const { clientId } = params
 
   // ── Auth check ──────────────────────────────────────────
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const portalCookie = cookieStore.get(`portal_${clientId}`)
   if (!portalCookie?.value) {
     redirect(`/portal/${clientId}/login`)
