@@ -31,13 +31,12 @@ const TASK_STATUS_CFG: Record<string, { icon: any; color: string }> = {
   pending:     { icon: Circle,       color: '#3A3A45' },
 }
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAuth()
-
-  const project = await getProject(params.id)
+  const { id } = await params
+  const project = await getProject(id)
   if (!project) notFound()
-
-  const stats = await getProjectStats(params.id)
+  const stats = await getProjectStats(id)
 
   const progress = stats.totalTasks > 0
     ? Math.round((stats.completedTasks / stats.totalTasks) * 100)

@@ -12,9 +12,10 @@ import { ArrowLeft } from 'lucide-react'
 export const metadata: Metadata = { title: 'Invoice' }
 export const dynamic = 'force-dynamic'
 
-export default async function InvoiceDetailPage({ params }: { params: { id: string } }) {
+export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAuth()
-  const invoice = await getInvoice(params.id)
+  const { id } = await params
+  const invoice = await getInvoice(id)
   if (!invoice) notFound()
 
   const subtotal = invoice.lineItems.reduce((s, li) => s + li.total, 0)
