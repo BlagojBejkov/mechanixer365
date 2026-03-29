@@ -207,9 +207,9 @@ export const invoices = sqliteTable('invoices', {
   status:      text('status', {
     enum: ['draft', 'sent', 'paid', 'overdue', 'cancelled']
   }).notNull().default('draft'),
-  issueDate:   integer('issue_date', { mode: 'timestamp' }).notNull(),
-  dueDate:     integer('due_date', { mode: 'timestamp' }).notNull(),
-  paidDate:    integer('paid_date', { mode: 'timestamp' }),
+  issueDate: integer('issue_date', { mode: 'timestamp_ms' }).notNull(),
+  dueDate: integer('due_date', { mode: 'timestamp_ms' }).notNull(),
+  paidDate: integer('paid_date', { mode: 'timestamp_ms' }),
   currency:    text('currency').default('EUR'),
   subtotal:    real('subtotal').notNull().default(0),
   tax:         real('tax').default(0),
