@@ -158,7 +158,7 @@ export async function getInvoices(filter?: string) {
   return db.query.invoices.findMany({
     where: filter && filter !== 'all' ? eq(invoices.status, filter as any) : undefined,
     orderBy: [desc(invoices.id)],
-    with: { client: true, project: true, lineItems: true },
+    with: { client: true, project: true },  // ← removed lineItems
   })
 }
 
