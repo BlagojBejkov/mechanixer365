@@ -310,6 +310,14 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
   lineItems: many(invoiceLineItems),
 }))
 
+export const invoiceLineItemsRelations = relations(invoiceLineItems, ({ one }) => ({
+  invoice: one(invoices, { fields: [invoiceLineItems.invoiceId], references: [invoices.id] }),
+}))
+
+export const quoteLineItemsRelations = relations(quoteLineItems, ({ one }) => ({
+  quote: one(quotes, { fields: [quoteLineItems.quoteId], references: [quotes.id] }),
+}))
+
 export const filesRelations = relations(files, ({ one }) => ({
   project: one(projects, { fields: [files.projectId], references: [projects.id] }),
   uploader: one(users, { fields: [files.uploadedBy], references: [users.id] }),
