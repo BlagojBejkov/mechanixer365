@@ -157,7 +157,7 @@ export async function getProjectStats(projectId: string) {
 export async function getInvoices(filter?: string) {
   return db.query.invoices.findMany({
     where: filter && filter !== 'all' ? eq(invoices.status, filter as any) : undefined,
-    orderBy: [desc(invoices.issueDate)],
+    orderBy: [desc(invoices.id)],
     with: { client: true, project: true, lineItems: true },
   })
 }
@@ -176,7 +176,7 @@ export async function getInvoice(id: string) {
 export async function getRevenueByMonth(year: number) {
   return db
     .select({
-      month: sql<number>`strftime('%m', datetime(${invoices.paidDate} / 1000, 'unixepoch'))`,
+      month: sql<number>`strftime('%m', datetime(${invoices.paidDate} / 1000000, 'unixepoch'))`,
       total: sql<number>`sum(${invoices.total})`,
     })
     .from(invoices)
