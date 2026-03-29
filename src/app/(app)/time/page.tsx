@@ -25,7 +25,7 @@ export default async function TimePage() {
   await requireAuth()
   const { start: weekStart, end: weekEnd } = getWeekRange(new Date())
 
-  const engineers = await db.query.users.findMany({ where: eq(users.role, 'engineer') })
+  const engineers = await db.query.users.findMany({ where: notInArray(users.role, ['owner'] as any) })
   const activeProjects = await db.query.projects.findMany({
     where: eq(projects.status, 'active'),
     with: { client: true },
