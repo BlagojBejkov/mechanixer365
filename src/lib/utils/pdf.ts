@@ -1,41 +1,42 @@
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface InvoicePDFData {
-  number:    string
-  title:     string
+  number: string
+  title: string
   issueDate: Date
-  dueDate:   Date
+  dueDate: Date
   client: {
-    companyName:    string
-    contactName:    string
-    contactEmail:   string
+    companyName: string
+    contactName: string
+    contactEmail: string
     billingAddress?: string
-    vatNumber?:     string
+    vatNumber?: string
   }
   lineItems: {
     description: string
-    quantity:    number
-    unit:        string
-    unitPrice:   number
-    total:       number
+    quantity: number
+    unit: string
+    unitPrice: number
+    total: number
   }[]
-  subtotal:  number
-  tax:       number
-  total:     number
-  notes?:    string
-  terms?:    string
-  currency:  string
+  subtotal: number
+  tax: number
+  total: number
+  notes?: string
+  terms?: string
+  currency: string
 }
 
-export function generateInvoicePDF(data: InvoicePDFData): void {
+export async function generateInvoicePDF(data: InvoicePDFData): Promise<void> {
+  // Dynamic imports — browser-only, never runs on the server
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
+
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
   const margin = 20
 
-  // ── Header ─────────────────────────────────────────
-  // Company name
+  // ── Header ────────────────────────────────────────
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(22)
   doc.setTextColor(15, 15, 20)
@@ -67,7 +68,6 @@ export function generateInvoicePDF(data: InvoicePDFData): void {
   doc.setFontSize(9)
   doc.setTextColor(30, 30, 36)
 
-  // From: Mechanixer
   const from = [
     'Mechanixer Engineering Studio',
     'blagoj@mechanixer.com',
@@ -75,7 +75,6 @@ export function generateInvoicePDF(data: InvoicePDFData): void {
   ]
   from.forEach((line, i) => doc.text(line, margin, 52 + i * 5))
 
-  // To: Client
   const to = [
     data.client.companyName,
     data.client.contactName,
@@ -117,13 +116,8 @@ export function generateInvoicePDF(data: InvoicePDFData): void {
       fontSize: 8,
       fontStyle: 'bold',
     },
-    bodyStyles: {
-      fontSize: 9,
-      textColor: [50, 50, 60],
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 248],
-    },
+    bodyStyles: { fontSize: 9, textColor: [50, 50, 60] },
+    alternateRowStyles: { fillColor: [245, 245, 248] },
     columnStyles: {
       0: { cellWidth: 80 },
       1: { halign: 'right', cellWidth: 15 },
@@ -155,12 +149,10 @@ export function generateInvoicePDF(data: InvoicePDFData): void {
     doc.text(formatCurrency(data.tax, data.currency), W - margin, tY, { align: 'right' })
   }
 
-  // Total line
   tY += 8
   doc.setDrawColor(200, 200, 212)
   doc.setLineWidth(0.3)
   doc.line(totalsX, tY - 3, W - margin, tY - 3)
-
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
   doc.setTextColor(15, 15, 20)
@@ -202,6 +194,5 @@ export function generateInvoicePDF(data: InvoicePDFData): void {
   doc.setTextColor(107, 107, 122)
   doc.text('Mechanixer Engineering Studio · mechanixer.com', W / 2, 285, { align: 'center' })
 
-  // Save
   doc.save(`${data.number}.pdf`)
 }

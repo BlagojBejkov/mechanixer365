@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileDown, Send, CheckCircle2, ChevronDown } from 'lucide-react'
+import { FileDown, Send, CheckCircle2, ChevronDown, Loader2 } from 'lucide-react'
 import { markInvoiceSent, markInvoicePaid } from '@/lib/actions/finance'
 import { generateInvoicePDF } from '@/lib/utils/pdf'
 
@@ -39,23 +39,29 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
 
-  function handleExportPDF() {
-    generateInvoicePDF({
-      number:    invoice.number,
-      title:     invoice.title,
-      issueDate: new Date(invoice.issueDate),
-      dueDate:   new Date(invoice.dueDate),
-      client:    invoice.client,
-      lineItems: invoice.lineItems,
-      subtotal:  invoice.subtotal,
-      tax:       invoice.tax,
-      total:     invoice.total,
-      notes:     invoice.notes,
-      terms:     invoice.terms,
-      currency:  invoice.currency,
-    })
+  async function handleExportPDF() {
     setMenuOpen(false)
+    setPdfLoading(true)
+    try {
+      await generateInvoicePDF({
+        number: invoice.number,
+        title: invoice.title,
+        issueDate: new Date(invoice.issueDate),
+        dueDate: new Date(invoice.dueDate),
+        client: invoice.client,
+        lineItems: invoice.lineItems,
+        subtotal: invoice.subtotal,
+        tax: invoice.tax,
+        total: invoice.total,
+        notes: invoice.notes,
+        terms: invoice.terms,
+        currency: invoice.currency,
+      })
+    } finally {
+      setPdfLoading(false)
+    }
   }
 
   async function handleMarkSent() {
@@ -79,51 +85,65 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
       {/* PDF export — always available */}
       <button
         onClick={handleExportPDF}
+        disabled={pdfLoading}
         className="btn btn-ghost text-xs"
         title="Export as PDF"
       >
-        <FileDown size={14} />
-        Export PDF
+        {pdfLoading
+          ? <Loader2 size={14} className="animate-spin" />
+          : <FileDown size={14} />
+        }
+        {pdfLoading ? 'Generating…' : 'Export PDF'}
       </button>
 
       {/* Status actions dropdown */}
-      {invoice.status !== 'paid' && (
+      {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
         <div className="relative">
           <button
             onClick={() => setMenuOpen(v => !v)}
             disabled={isPending}
             className="btn btn-primary text-xs"
           >
-            {isPending ? 'Updating…' : 'Actions'}
-            <ChevronDown size={12} />
+            {isPending
+              ? <><Loader2 size={12} className="animate-spin" /> Updating…</>
+              : <>Actions <ChevronDown size={12} /></>
+            }
           </button>
 
           {menuOpen && (
             <>
+              <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
               <div
-                className="fixed inset-0 z-30"
-                onClick={() => setMenuOpen(false)}
-              />
-              <div
-                className="absolute right-0 top-full mt-1 w-44 rounded-md z-40 overflow-hidden"
+                className="absolute right-0 top-full mt-1 w-48 rounded-lg z-40 overflow-hidden shadow-xl"
                 style={{ background: '#1E1E24', border: '1px solid #2A2A32' }}
               >
                 {invoice.status === 'draft' && (
                   <button
                     onClick={handleMarkSent}
-                    className="flex items-center gap-2 px-3 py-2.5 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors"
                   >
-                    <Send size={13} className="text-mx-accent" />
+                    <Send size={13} className="text-mx-accent flex-shrink-0" />
                     Mark as Sent
                   </button>
                 )}
                 {(invoice.status === 'sent' || invoice.status === 'overdue') && (
                   <button
                     onClick={handleMarkPaid}
-                    className="flex items-center gap-2 px-3 py-2.5 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors"
                   >
-                    <CheckCircle2 size={13} className="text-mx-green" />
+                    <CheckCircle2 size={13} className="text-green-400 flex-shrink-0" />
                     Mark as Paid
+                  </button>
+                )}
+                {invoice.status === 'draft' && (
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={pdfLoading}
+                    className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors border-t"
+                    style={{ borderColor: '#2A2A32' }}
+                  >
+                    <FileDown size={13} className="text-mx-mid flex-shrink-0" />
+                    Export PDF
                   </button>
                 )}
               </div>
@@ -133,10 +153,10 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
       )}
 
       {invoice.status === 'paid' && (
-        <button onClick={handleExportPDF} className="btn btn-ghost text-xs">
-          <CheckCircle2 size={14} className="text-mx-green" />
+        <span className="flex items-center gap-1.5 text-xs font-medium text-green-400">
+          <CheckCircle2 size={14} />
           Paid
-        </button>
+        </span>
       )}
     </div>
   )

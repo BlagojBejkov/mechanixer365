@@ -7,6 +7,7 @@ import { getInvoices } from '@/lib/db/queries'
 import { requireAuth } from '@/lib/auth'
 import { Plus, Receipt, TrendingUp, AlertCircle, CheckCircle2, FileText, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
+import SendRemindersButton from '@/components/finance/SendRemindersButton'
 
 export const metadata: Metadata = { title: 'Finance' }
 export const dynamic = 'force-dynamic'
@@ -16,7 +17,6 @@ export default async function FinancePage() {
   const invoices = await getInvoices()
   const now = new Date()
 
-  // Enrich with effective status
   const enriched = invoices.map(inv => ({
     ...inv,
     effectiveStatus: (inv.status === 'sent' && inv.dueDate && new Date(inv.dueDate) < now
@@ -24,10 +24,9 @@ export default async function FinancePage() {
       : inv.status) as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
   }))
 
-  const outstanding  = enriched.filter(i => i.effectiveStatus === 'sent').reduce((s, i) => s + i.total, 0)
-  const overdue      = enriched.filter(i => i.effectiveStatus === 'overdue').reduce((s, i) => s + i.total, 0)
+  const outstanding = enriched.filter(i => i.effectiveStatus === 'sent').reduce((s, i) => s + i.total, 0)
+  const overdue = enriched.filter(i => i.effectiveStatus === 'overdue').reduce((s, i) => s + i.total, 0)
   const overdueCount = enriched.filter(i => i.effectiveStatus === 'overdue').length
-
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
   const paidThisMonth = enriched
     .filter(i => i.status === 'paid' && i.paidDate && new Date(i.paidDate) >= monthStart)
@@ -52,9 +51,9 @@ export default async function FinancePage() {
 
       <div className="px-8 py-6 space-y-6">
         <div className="grid grid-cols-4 gap-4">
-          <StatCard label="Outstanding"    value={formatCurrency(outstanding)}  sub="Awaiting payment"                                  icon={Receipt}      accent />
-          <StatCard label="Overdue"        value={formatCurrency(overdue)}      sub={`${overdueCount} invoice${overdueCount !== 1 ? 's' : ''} past due`} icon={AlertCircle} />
-          <StatCard label="Paid This Month" value={formatCurrency(paidThisMonth)}                                                       icon={CheckCircle2} />
+          <StatCard label="Outstanding" value={formatCurrency(outstanding)} sub="Awaiting payment" icon={Receipt} accent />
+          <StatCard label="Overdue" value={formatCurrency(overdue)} sub={`${overdueCount} invoice${overdueCount !== 1 ? 's' : ''} past due`} icon={AlertCircle} />
+          <StatCard label="Paid This Month" value={formatCurrency(paidThisMonth)} icon={CheckCircle2} />
           <StatCard label="Total Invoiced" value={formatCurrency(invoices.reduce((s, i) => s + i.total, 0))} sub={`${invoices.length} invoices`} icon={TrendingUp} />
         </div>
 
@@ -62,6 +61,7 @@ export default async function FinancePage() {
           <div className="section-header px-5 pt-5 pb-0">
             <span className="section-title">Invoices</span>
           </div>
+
           {enriched.length === 0 ? (
             <div className="px-5 py-12 text-center">
               <p className="text-mx-subtle text-sm">No invoices yet.</p>
@@ -116,9 +116,7 @@ export default async function FinancePage() {
               </p>
               <p className="text-xs text-mx-mid mt-0.5">Send a payment reminder to your clients.</p>
             </div>
-            <button className="btn btn-ghost text-xs" style={{ color: '#EF4444', borderColor: '#EF444430' }}>
-              Send Reminders
-            </button>
+            <SendRemindersButton />
           </div>
         )}
       </div>
