@@ -3,6 +3,7 @@
 import { db } from '@/lib/db'
 import { projects, tasks, milestones } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { milestones, tasks } from '@/lib/db/schema'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -91,4 +92,33 @@ export async function createMilestone(data: {
   await db.insert(milestones).values({ ...data, status: 'pending' })
   revalidatePath(`/projects/${data.projectId}`)
   return { success: true }
+}
+
+export async function createMilestone(projectId: string, formData: FormData) {
+  const name = formData.get('name') as string
+  const dueDateStr = formData.get('dueDate') as string | null
+  const dueDate = dueDateStr ? new Date(dueDateStr) : null
+  await db.insert(milestones).values({
+    projectId,
+    name,
+    dueDate: dueDate ?? undefined,
+    status: 'pending',
+    order: 0,
+  })
+  revalidatePath(`/projects/${projectId}`)
+}
+
+export async function createTask(projectId: string, milestoneId: string, formData: FormData) {
+  const title = formData.get('title') as string
+  const assignedTo = formData.get('assignedTo') as string | null
+  await db.insert(tasks).values({
+    projectId,
+    milestoneId,
+    title,
+    assignedTo: assignedTo || undefined,
+    status: 'todo',
+    priority: 'medium',
+    order: 0,
+  })
+  revalidatePath(`/projects/${projectId}`)
 }
