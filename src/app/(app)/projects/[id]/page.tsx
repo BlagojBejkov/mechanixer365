@@ -8,9 +8,10 @@ import { formatCurrency, formatDate, formatHours } from '@/lib/utils'
 import { getProject, getProjectStats } from '@/lib/db/queries'
 import { requireAuth } from '@/lib/auth'
 import {
-  FileDown, Plus, Timer, DollarSign, Users, Calendar
+  FileDown, DollarSign, Users, Calendar
 } from 'lucide-react'
 import ProjectTaskManager from '@/components/projects/ProjectTaskManager'
+import LogTimeButton from '@/components/projects/LogTimeButton'
 
 export const metadata: Metadata = { title: 'Project' }
 export const dynamic = 'force-dynamic'
@@ -37,7 +38,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   const budgetColor = budgetPct > 95 ? 'red' as const : budgetPct > 80 ? 'amber' as const : 'green' as const
 
-  // Safely map milestones with proper types
   const milestones = (project.milestones ?? []).map(m => ({
     id: m.id,
     name: m.name,
@@ -60,9 +60,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         subtitle={`${project.client?.companyName} · ${project.type.replace(/_/g, ' ')}`}
         actions={
           <div className="flex items-center gap-2">
-            <button className="btn btn-ghost text-xs">
-              <Timer size={14} /> Log Time
-            </button>
+            {/* Client component — handles modal open/close state */}
+            <LogTimeButton projectId={project.id} projectName={project.name} />
             <StatusBadge status={project.status} />
           </div>
         }
