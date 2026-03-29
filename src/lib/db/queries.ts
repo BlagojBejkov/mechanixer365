@@ -1,36 +1,46 @@
 import { db } from '@/lib/db'
 import { eq, desc, and, gte, lte, sql, count, notInArray } from 'drizzle-orm'
-import {
-  leads, clients, projects, tasks, timeEntries,
-  invoices, invoiceLineItems, milestones, users, files
-} from './schema'
+import { leads, clients, projects, tasks, timeEntries, invoices, invoiceLineItems, milestones, users, files } from './schema'
 
 // ── Dashboard ────────────────────────────────────────
-
 export async function getDashboardStats() {
   const now = new Date()
   const startOfYear = new Date(now.getFullYear(), 0, 1)
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
+  // Use raw SQL for date comparisons since paidDate is timestamp_ms (milliseconds stored as integer)
+  const yearMs = startOfYear.getTime()
+  const monthMs = startOfMonth.getTime()
+
   const [revenueYTD] = await db
     .select({ total: sql<number>`coalesce(sum(${invoices.total}), 0)` })
     .from(invoices)
-    .where(and(eq(invoices.status, 'paid'), gte(invoices.paidDate, startOfYear)))
+    .where(and(
+      eq(invoices.status, 'paid'),
+      sql`${invoices.paidDate} >= ${yearMs}`
+    ))
 
   const [revenueThisMonth] = await db
     .select({ total: sql<number>`coalesce(sum(${invoices.total}), 0)` })
     .from(invoices)
-    .where(and(eq(invoices.status, 'paid'), gte(invoices.paidDate, startOfMonth)))
+    .where(and(
+      eq(invoices.status, 'paid'),
+      sql`${invoices.paidDate} >= ${monthMs}`
+    ))
 
   const [outstanding] = await db
     .select({ total: sql<number>`coalesce(sum(${invoices.total}), 0)` })
     .from(invoices)
     .where(eq(invoices.status, 'sent'))
 
+  const nowMs = now.getTime()
   const [overdueRow] = await db
     .select({ n: count() })
     .from(invoices)
-    .where(and(eq(invoices.status, 'sent'), lte(invoices.dueDate, now)))
+    .where(and(
+      eq(invoices.status, 'sent'),
+      sql`${invoices.dueDate} < ${nowMs}`
+    ))
 
   const activeProjects = await db.query.projects.findMany({
     where: eq(projects.status, 'active'),
@@ -55,7 +65,6 @@ export async function getDashboardStats() {
 }
 
 // ── CRM ──────────────────────────────────────────────
-
 export async function getLeads() {
   return db.query.leads.findMany({
     orderBy: [desc(leads.createdAt)],
@@ -83,13 +92,12 @@ export async function getClient(id: string) {
     where: eq(clients.id, id),
     with: {
       projects: { with: { timeEntries: true, invoices: true } },
-      invoices: { orderBy: [desc(invoices.issueDate)] },
+      invoices: { orderBy: [desc(invoices.id)] },
     },
   })
 }
 
 // ── Projects ─────────────────────────────────────────
-
 export async function getProjects(filter?: string) {
   return db.query.projects.findMany({
     where: filter && filter !== 'all' ? eq(projects.status, filter as any) : undefined,
@@ -120,7 +128,7 @@ export async function getProject(id: string) {
         orderBy: [desc(timeEntries.date)],
       },
       files: { orderBy: [desc(files.createdAt)] },
-      invoices: { orderBy: [desc(invoices.issueDate)] },
+      invoices: { orderBy: [desc(invoices.id)] },
     },
   })
 }
@@ -152,13 +160,12 @@ export async function getProjectStats(projectId: string) {
   }
 }
 
-// ── Finance ──────────────────────────────────────────
-
+// ── Finance ───────────────────────────────────────────
 export async function getInvoices(filter?: string) {
   return db.query.invoices.findMany({
     where: filter && filter !== 'all' ? eq(invoices.status, filter as any) : undefined,
     orderBy: [desc(invoices.id)],
-    with: { client: true, project: true },  // ← removed lineItems
+    with: { client: true, project: true },
   })
 }
 
@@ -174,9 +181,11 @@ export async function getInvoice(id: string) {
 }
 
 export async function getRevenueByMonth(year: number) {
+  // paidDate is stored as milliseconds (timestamp_ms mode)
+  // SQLite unixepoch expects seconds, so divide by 1000
   return db
     .select({
-      month: sql<number>`strftime('%m', datetime(${invoices.paidDate} / 1000000, 'unixepoch'))`,
+      month: sql<number>`cast(strftime('%m', datetime(${invoices.paidDate} / 1000, 'unixepoch')) as integer)`,
       total: sql<number>`sum(${invoices.total})`,
     })
     .from(invoices)
@@ -198,8 +207,7 @@ export async function getUnbilledHoursByProject() {
     .groupBy(timeEntries.projectId)
 }
 
-// ── Portal ───────────────────────────────────────────
-
+// ── Portal ────────────────────────────────────────────
 export async function getPortalData(clientId: string) {
   return db.query.clients.findFirst({
     where: and(eq(clients.id, clientId), eq(clients.portalEnabled, true)),
@@ -208,12 +216,15 @@ export async function getPortalData(clientId: string) {
         where: eq(projects.portalVisible, true),
         with: {
           milestones: { orderBy: [milestones.order] },
-          files: { where: eq(files.portalVisible, true), orderBy: [desc(files.createdAt)] },
+          files: {
+            where: eq(files.portalVisible, true),
+            orderBy: [desc(files.createdAt)],
+          },
         },
       },
       invoices: {
         where: eq(invoices.portalVisible, true),
-        orderBy: [desc(invoices.issueDate)],
+        orderBy: [desc(invoices.id)],
       },
     },
   })
