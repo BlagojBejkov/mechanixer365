@@ -29,8 +29,13 @@ export function formatHours(hours: number): string {
 }
 
 // ─── Dates ──────────────────────────────────
-export function formatDate(date: Date | string | number, fmt = 'MMM d, yyyy'): string {
-  return format(new Date(date), fmt)
+export function formatDate(date: Date | string | number | null | undefined, fmt = 'MMM d, yyyy'): string {
+  if (!date) return '—'
+  try {
+    return format(new Date(date as Date), fmt)
+  } catch {
+    return '—'
+  }
 }
 
 export function formatDateRelative(date: Date | string | number): string {
