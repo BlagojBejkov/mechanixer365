@@ -3,7 +3,7 @@ import TimeWeekView from '@/components/time/TimeWeekView'
 import { formatDate } from '@/lib/utils'
 import { db } from '@/lib/db'
 import { users, projects, timeEntries } from '@/lib/db/schema'
-import { eq, and, gte, lte, desc } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, notInArray } from 'drizzle-orm'
 import { requireAuth } from '@/lib/auth'
 
 export const metadata: Metadata = { title: 'Time' }
@@ -23,9 +23,18 @@ function getWeekRange(date: Date) {
 
 export default async function TimePage() {
   await requireAuth()
+
   const { start: weekStart, end: weekEnd } = getWeekRange(new Date())
 
-  const engineers = await db.query.users.findMany({ where: notInArray(users.role, ['owner'] as any) })
+  // Get all team members (engineer role — set via Turso, includes Tomche + Katerina)
+  // Fall back to all users if no engineers found
+  let engineers = await db.query.users.findMany({
+    where: eq(users.role, 'engineer'),
+  })
+  if (engineers.length === 0) {
+    engineers = await db.query.users.findMany()
+  }
+
   const activeProjects = await db.query.projects.findMany({
     where: eq(projects.status, 'active'),
     with: { client: true },
@@ -33,7 +42,11 @@ export default async function TimePage() {
 
   const weekEntries = await db.query.timeEntries.findMany({
     where: and(gte(timeEntries.date, weekStart), lte(timeEntries.date, weekEnd)),
-    with: { user: true, project: { with: { client: true } }, task: true },
+    with: {
+      user: true,
+      project: { with: { client: true } },
+      task: true,
+    },
     orderBy: [desc(timeEntries.date)],
   })
 
