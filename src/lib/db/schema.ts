@@ -286,11 +286,10 @@ export const milestonesRelations = relations(milestones, ({ one, many }) => ({
   tasks: many(tasks),
 }))
 
-export const tasksRelations = relations(tasks, ({ one, many }) => ({
+export const tasksRelations = relations(tasks, ({ one }) => ({
   project: one(projects, { fields: [tasks.projectId], references: [projects.id] }),
   milestone: one(milestones, { fields: [tasks.milestoneId], references: [milestones.id] }),
   assignedUser: one(users, { fields: [tasks.assignedTo], references: [users.id] }),
-  timeEntries: many(timeEntries),
 }))
 
 export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
@@ -359,10 +358,4 @@ export type Session = typeof sessions.$inferSelect
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}))
-
-export const tasksRelations = relations(tasks, ({ one }) => ({
-  project: one(projects, { fields: [tasks.projectId], references: [projects.id] }),
-  milestone: one(milestones, { fields: [tasks.milestoneId], references: [milestones.id] }),
-  assignedUser: one(users, { fields: [tasks.assignedTo], references: [users.id] }),
 }))
