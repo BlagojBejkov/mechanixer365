@@ -21,8 +21,9 @@ export default function NewProjectForm({
     const formData = new FormData(formRef.current!)
     startTransition(async () => {
       try {
-        const id = await createProject(formData)
-        router.push(`/projects/${id}`)
+        const result = await createProject(formData)
+        if (result?.id) router.push(`/projects/${result.id}`)
+        else setError('Failed to create project')
       } catch (err: any) {
         setError(err.message || 'Failed to create project')
       }
