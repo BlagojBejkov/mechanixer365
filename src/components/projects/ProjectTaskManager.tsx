@@ -228,9 +228,7 @@ export default function ProjectTaskManager({ projectId, milestones }: Props) {
     <div className="space-y-3">
       <div className="section-header">
         <span className="section-title">Milestones & Tasks</span>
-        <button className="btn btn-ghost text-xs">
-          <AddMilestoneModal projectId={projectId} />
-        </button>
+        <AddMilestoneModal projectId={projectId} />
       </div>
       {milestones.length === 0 ? (
         <div className="card p-8 text-center">
