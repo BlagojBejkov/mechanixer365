@@ -2,6 +2,7 @@
 import { useRef, useState, useTransition } from 'react'
 import { X, Plus } from 'lucide-react'
 import { createTask } from '@/lib/actions/projects'
+import { createMilestone } from '@/lib/actions/projects'
 
 const ENGINEERS = [
   { id: 'usr_blagoj', name: 'Blagoj' },
@@ -21,14 +22,18 @@ export default function AddTaskModal({
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const formData = new FormData(formRef.current!)
-    startTransition(async () => {
-      await createTask(projectId, milestoneId, formData)
-      formRef.current?.reset()
-      setOpen(false)
+  e.preventDefault()
+  const name = formRef.current?.querySelector<HTMLInputElement>('input[name="name"]')?.value || ''
+  const dueDateStr = formRef.current?.querySelector<HTMLInputElement>('input[name="dueDate"]')?.value
+  startTransition(async () => {
+    await createMilestone({
+      projectId,
+      name,
+      dueDate: dueDateStr ? new Date(dueDateStr) : undefined,
     })
-  }
+    setOpen(false)
+  })
+}
 
   return (
     <>

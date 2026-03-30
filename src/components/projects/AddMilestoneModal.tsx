@@ -9,14 +9,18 @@ export default function AddMilestoneModal({ projectId }: { projectId: string }) 
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const formData = new FormData(formRef.current!)
-    startTransition(async () => {
-      await createMilestone(projectId, formData)
-      formRef.current?.reset()
-      setOpen(false)
+  e.preventDefault()
+  const name = formRef.current?.querySelector<HTMLInputElement>('input[name="name"]')?.value || ''
+  const dueDateStr = formRef.current?.querySelector<HTMLInputElement>('input[name="dueDate"]')?.value
+  startTransition(async () => {
+    await createMilestone({
+      projectId,
+      name,
+      dueDate: dueDateStr ? new Date(dueDateStr) : undefined,
     })
-  }
+    setOpen(false)
+  })
+}
 
   return (
     <>
