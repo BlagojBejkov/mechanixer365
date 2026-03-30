@@ -3,7 +3,6 @@
 import { db } from '@/lib/db'
 import { projects, tasks, milestones } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { milestones, tasks } from '@/lib/db/schema'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -94,31 +93,28 @@ export async function createMilestone(data: {
   return { success: true }
 }
 
-export async function createMilestone(projectId: string, formData: FormData) {
+export async function createProject(formData: FormData): Promise<string> {
   const name = formData.get('name') as string
-  const dueDateStr = formData.get('dueDate') as string | null
-  const dueDate = dueDateStr ? new Date(dueDateStr) : null
-  await db.insert(milestones).values({
-    projectId,
-    name,
-    dueDate: dueDate ?? undefined,
-    status: 'pending',
-    order: 0,
-  })
-  revalidatePath(`/projects/${projectId}`)
-}
+  const clientId = formData.get('clientId') as string
+  const leadEngineerId = formData.get('leadEngineerId') as string | null
+  const type = (formData.get('type') as string) || 'fixed'
+  const budget = formData.get('budget') ? Number(formData.get('budget')) : null
+  const startDateStr = formData.get('startDate') as string | null
+  const endDateStr = formData.get('endDate') as string | null
+  const description = formData.get('description') as string | null
 
-export async function createTask(projectId: string, milestoneId: string, formData: FormData) {
-  const title = formData.get('title') as string
-  const assignedTo = formData.get('assignedTo') as string | null
-  await db.insert(tasks).values({
-    projectId,
-    milestoneId,
-    title,
-    assignedTo: assignedTo || undefined,
-    status: 'todo',
-    priority: 'medium',
-    order: 0,
-  })
-  revalidatePath(`/projects/${projectId}`)
+  const result = await db.insert(projects).values({
+    name,
+    clientId,
+    leadEngineerId: leadEngineerId || undefined,
+    type,
+    budget: budget ?? undefined,
+    startDate: startDateStr ? new Date(startDateStr) : undefined,
+    endDate: endDateStr ? new Date(endDateStr) : undefined,
+    description: description || undefined,
+    status: 'active',
+  }).returning({ id: projects.id })
+
+  revalidatePath('/projects')
+  return result[0].id
 }

@@ -5,6 +5,8 @@ import { CheckCircle2, Circle, Clock, AlertCircle, Plus, ChevronDown, ChevronRig
 import { formatDate, formatHours } from '@/lib/utils'
 import { updateTaskStatus, createTask } from '@/lib/actions/projects'
 import Avatar from '@/components/ui/Avatar'
+import AddMilestoneModal from './AddMilestoneModal'
+import AddTaskModal from './AddTaskModal'
 
 type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done'
 type MilestoneStatus = 'pending' | 'in_progress' | 'completed'
@@ -227,7 +229,7 @@ export default function ProjectTaskManager({ projectId, milestones }: Props) {
       <div className="section-header">
         <span className="section-title">Milestones & Tasks</span>
         <button className="btn btn-ghost text-xs">
-          <Plus size={12} /> Add Milestone
+          <AddMilestoneModal projectId={projectId} />
         </button>
       </div>
       {milestones.length === 0 ? (
