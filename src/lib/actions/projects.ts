@@ -88,7 +88,19 @@ export async function createMilestone(data: {
   dueDate?: Date
   order?: number
 }) {
-  await db.insert(milestones).values({ ...data, status: 'pending' })
+  try {
+    await db.insert(milestones).values({
+      projectId: data.projectId,
+      name: data.name,
+      description: data.description,
+      status: 'pending',
+      dueDate: data.dueDate ?? null,
+      order: data.order ?? 0,
+    })
+  } catch (e: any) {
+    console.error('createMilestone ERROR:', e?.message, e?.code, JSON.stringify(e))
+    throw e
+  }
   revalidatePath(`/projects/${data.projectId}`)
   return { success: true }
 }
