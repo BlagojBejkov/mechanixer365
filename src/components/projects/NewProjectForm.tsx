@@ -63,8 +63,8 @@ export default function NewProjectForm({
           <div>
             <label className="text-2xs text-mx-mid mb-1 block">Type</label>
             <select name="type" className="input w-full">
-              <option value="fixed">Fixed Price</option>
-              <option value="hourly">Hourly</option>
+              <option value="fixed_price">Fixed Price</option>
+              <option value="time_and_materials">Time &amp; Materials</option>
               <option value="retainer">Retainer</option>
             </select>
           </div>
