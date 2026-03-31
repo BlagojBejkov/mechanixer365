@@ -28,9 +28,11 @@ interface Milestone {
   tasks: Task[]
 }
 
+interface User { id: string; name: string }
 interface Props {
   projectId: string
   milestones: Milestone[]
+  users?: User[]
 }
 
 const TASK_STATUS_CFG: Record<string, { icon: any; color: string; next: string }> = {
@@ -110,14 +112,17 @@ function TaskRow({
 function MilestoneSection({
   milestone,
   projectId,
+  users = [],
 }: {
   milestone: Milestone
   projectId: string
+  users?: { id: string; name: string }[]
 }) {
   const [expanded, setExpanded] = useState(milestone.status !== 'completed')
   const [tasks, setTasks] = useState(milestone.tasks)
   const [addingTask, setAddingTask] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [newTaskAssignee, setNewTaskAssignee] = useState('')
   const [isPending, startTransition] = useTransition()
 
   const cfg = MILESTONE_STATUS_CFG[milestone.status] ?? MILESTONE_STATUS_CFG['pending']
@@ -200,6 +205,17 @@ function MilestoneSection({
           {addingTask ? (
             <div className="flex items-center gap-2 px-3 py-2">
               <Circle size={15} className="text-mx-subtle flex-shrink-0" />
+              {users.length > 0 && (
+                <select
+                  value={newTaskAssignee}
+                  onChange={e => setNewTaskAssignee(e.target.value)}
+                  className="mx-input text-xs w-28 flex-shrink-0"
+                  disabled={isPending}
+                >
+                  <option value="">Assign...</option>
+                  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                </select>
+              )}
               <input
                 autoFocus
                 value={newTaskTitle}
