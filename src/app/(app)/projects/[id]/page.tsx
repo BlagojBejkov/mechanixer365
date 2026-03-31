@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import PageHeader from '@/components/layout/PageHeader'
-import StatusBadge from '@/components/ui/StatusBadge'
+import ProjectStatusButton from '@/components/projects/ProjectStatusButton'
 import ProgressBar from '@/components/ui/ProgressBar'
 import Avatar from '@/components/ui/Avatar'
 import { formatCurrency, formatDate, formatHours } from '@/lib/utils'
@@ -62,7 +62,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <div className="flex items-center gap-2">
             {/* Client component — handles modal open/close state */}
             <LogTimeButton projectId={project.id} projectName={project.name} />
-            <StatusBadge status={project.status} />
+            <ProjectStatusButton projectId={project.id} initialStatus={project.status} />
           </div>
         }
       />
