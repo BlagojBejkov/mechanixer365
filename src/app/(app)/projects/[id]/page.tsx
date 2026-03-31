@@ -6,6 +6,8 @@ import ProgressBar from '@/components/ui/ProgressBar'
 import Avatar from '@/components/ui/Avatar'
 import { formatCurrency, formatDate, formatHours } from '@/lib/utils'
 import { getProject, getProjectStats } from '@/lib/db/queries'
+import { db } from '@/lib/db'
+import { users } from '@/lib/db/schema'
 import { requireAuth } from '@/lib/auth'
 import {
   FileDown, DollarSign, Users, Calendar
@@ -23,6 +25,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   if (!project) notFound()
 
   const stats = await getProjectStats(id)
+  const teamUsers = await db.select({ id: users.id, name: users.name }).from(users).orderBy(users.name)
 
   const progress = stats.totalTasks > 0
     ? Math.round((stats.completedTasks / stats.totalTasks) * 100)
@@ -120,7 +123,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="grid grid-cols-3 gap-6">
           {/* Tasks */}
           <div className="col-span-2">
-            <ProjectTaskManager projectId={project.id} milestones={milestones} />
+            <ProjectTaskManager projectId={project.id} milestones={milestones} users={teamUsers} />
           </div>
 
           {/* Sidebar */}
