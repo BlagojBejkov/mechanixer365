@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { CheckCircle2, Circle, Clock, AlertCircle, Plus, ChevronDown, ChevronRight } from 'lucide-react'
 import { formatDate, formatHours } from '@/lib/utils'
-import { updateTaskStatus, createTask } from '@/lib/actions/projects'
+import { updateTaskStatus, createTask, updateMilestoneStatus } from '@/lib/actions/projects'
 import Avatar from '@/components/ui/Avatar'
 import AddMilestoneModal from './AddMilestoneModal'
 import AddTaskModal from './AddTaskModal'
@@ -159,7 +159,12 @@ function MilestoneSection({
         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-mx-muted/30 transition-colors"
         style={{ borderBottom: expanded ? '1px solid #1E1E24' : 'none' }}
       >
-        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
+        <button
+          onClick={cycleMilestoneStatus}
+          className="w-3 h-3 rounded-full flex-shrink-0 hover:scale-125 transition-transform cursor-pointer border-0 p-0"
+          style={{ background: cfg.color }}
+          title={`Status: ${milestoneStatus} — click to advance`}
+        />
         {expanded ? (
           <ChevronDown size={13} className="text-mx-mid flex-shrink-0" />
         ) : (
