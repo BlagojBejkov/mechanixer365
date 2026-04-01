@@ -25,9 +25,11 @@ export async function POST(req: NextRequest) {
     const blob = await put(
       `projects/${projectId}/${Date.now()}-${file.name}`,
       file,
-      { access: 'public' }
+      { access: 'private' }
     )
 
+    // For private blobs, get a download URL valid for serving
+    // Store blob.downloadUrl for private access
     // Save metadata to DB
     const fileId = createId()
     await db.insert(files).values({
