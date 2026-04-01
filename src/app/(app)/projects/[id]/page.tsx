@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import ProjectTaskManager from '@/components/projects/ProjectTaskManager'
 import LogTimeButton from '@/components/projects/LogTimeButton'
+import FileUploadButton from '@/components/projects/FileUploadButton'
 
 export const metadata: Metadata = { title: 'Project' }
 export const dynamic = 'force-dynamic'
@@ -199,7 +200,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <div className="card p-4">
               <div className="section-header">
                 <p className="section-title">Files</p>
-                <button className="text-2xs text-mx-accent hover:underline">Upload</button>
+                <FileUploadButton projectId={project.id} />
               </div>
               {(project.files ?? []).length === 0 ? (
                 <p className="text-2xs text-mx-subtle py-2">No files yet.</p>
