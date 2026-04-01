@@ -105,3 +105,14 @@ export async function createMilestone(data: {
   return { success: true }
 }
 
+export async function updateMilestoneStatus(
+  id: string,
+  projectId: string,
+  status: 'pending' | 'in_progress' | 'completed'
+) {
+  await db.update(milestones)
+    .set({ status })
+    .where(eq(milestones.id, id))
+  revalidatePath(`/projects/${projectId}`)
+  return { success: true }
+}
