@@ -116,3 +116,15 @@ export async function updateMilestoneStatus(
   revalidatePath(`/projects/${projectId}`)
   return { success: true }
 }
+
+export async function deleteTask(id: string, projectId: string) {
+  await db.delete(tasks).where(eq(tasks.id, id))
+  revalidatePath(`/projects/${projectId}`)
+  return { success: true }
+}
+
+export async function deleteMilestone(id: string, projectId: string) {
+  await db.delete(milestones).where(eq(milestones.id, id))
+  revalidatePath(`/projects/${projectId}`)
+  return { success: true }
+}
