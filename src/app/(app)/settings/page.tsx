@@ -3,7 +3,6 @@ import { requireAuth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import PageHeader from '@/components/layout/PageHeader'
-import Avatar from '@/components/ui/Avatar'
 import SettingsForm from '@/components/settings/SettingsForm'
 
 export const metadata: Metadata = { title: 'Settings' }
@@ -16,6 +15,7 @@ export default async function SettingsPage() {
     name: users.name,
     email: users.email,
     role: users.role,
+    billableRate: users.billableRate,
   }).from(users).orderBy(users.createdAt)
 
   return (
