@@ -1,15 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['jspdf', 'jspdf-autotable'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  images: {
-    remotePatterns: [{ protocol: 'https', hostname: '**' }],
-  },
+  serverExternalPackages: ['jspdf', 'jspdf-autotable', 'canvas'],
+  typescript: { ignoreBuildErrors: true },
+  images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },
 }
-
 module.exports = nextConfig
