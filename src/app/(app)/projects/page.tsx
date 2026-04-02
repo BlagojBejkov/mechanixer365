@@ -61,8 +61,10 @@ export default async function ProjectsPage() {
           />
         )}
         {projects.map(p => {
-          const totalTasks = p.tasks?.length ?? 0
-          const doneTasks = p.tasks?.filter(t => t.status === 'done').length ?? 0
+          const milestoneTasks = p.milestones?.flatMap(m => m.tasks ?? []) ?? []
+          const allTasks = [...(p.tasks ?? []), ...milestoneTasks]
+          const totalTasks = allTasks.length
+          const doneTasks = allTasks.filter(t => t.status === 'done' || t.status === 'completed').length
           const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
 
           // Time-based progress from logged hours vs budget
