@@ -105,7 +105,7 @@ export async function getProjects(filter?: string) {
     with: {
       client: true,
       leadEngineerUser: true,
-      milestones: { orderBy: [milestones.order] },
+      milestones: { orderBy: [milestones.order], with: { tasks: true } },
       tasks: true,
       timeEntries: true,
     },
@@ -229,3 +229,4 @@ export async function getPortalData(clientId: string) {
     },
   })
 }
+h
