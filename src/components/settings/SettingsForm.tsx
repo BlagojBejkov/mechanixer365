@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Avatar from '@/components/ui/Avatar'
 import { updateUserRate, inviteTeamMember } from '@/lib/actions/settings'
 
-type TeamMember = { id: string; name: string; email: string; role: string }
+type TeamMember = { id: string; name: string; email: string; role: string; billableRate?: number | null }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -14,6 +14,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </div>
   )
 }
+
 function SettingRow({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
   return (
     <div className="px-5 py-4 flex items-center justify-between gap-6">
@@ -27,7 +28,13 @@ function SettingRow({ label, description, children }: { label: string; descripti
 }
 
 export default function SettingsForm({ team }: { team: TeamMember[] }) {
-  const [rates, setRates] = useState<Record<string, string>>({})
+  const [rates, setRates] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {}
+    for (const m of team) {
+      if (m.billableRate != null) initial[m.id] = String(m.billableRate)
+    }
+    return initial
+  })
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteName, setInviteName] = useState('')
   const [showInvite, setShowInvite] = useState(false)
@@ -35,13 +42,8 @@ export default function SettingsForm({ team }: { team: TeamMember[] }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  function getRateForUser(id: string, fallback?: string) {
-    return rates[id] ?? fallback ?? ''
-  }
-
   function handleSave() {
     startTransition(async () => {
-      // Save each rate that was changed
       for (const [userId, rate] of Object.entries(rates)) {
         const numeric = parseFloat(rate.replace(/[^0-9.]/g, ''))
         if (!isNaN(numeric)) {
@@ -101,7 +103,10 @@ export default function SettingsForm({ team }: { team: TeamMember[] }) {
               <input
                 className="mx-input w-24 font-mono text-xs"
                 placeholder="€/h"
-                value={getRateForUser(member.id)}
+                type="number"
+                min="0"
+                step="0.5"
+                value={rates[member.id] ?? ''}
                 onChange={e => setRates(prev => ({ ...prev, [member.id]: e.target.value }))}
               />
             </div>
@@ -109,31 +114,14 @@ export default function SettingsForm({ team }: { team: TeamMember[] }) {
         ))}
         {showInvite ? (
           <div className="px-5 py-4 flex items-center gap-3">
-            <input
-              className="mx-input flex-1 text-xs"
-              placeholder="Name"
-              value={inviteName}
-              onChange={e => setInviteName(e.target.value)}
-            />
-            <input
-              className="mx-input flex-1 text-xs"
-              placeholder="Email"
-              type="email"
-              value={inviteEmail}
-              onChange={e => setInviteEmail(e.target.value)}
-            />
-            <button onClick={handleInvite} disabled={isPending} className="btn btn-primary text-xs">
-              Add
-            </button>
-            <button onClick={() => setShowInvite(false)} className="btn btn-ghost text-xs">
-              Cancel
-            </button>
+            <input className="mx-input flex-1 text-xs" placeholder="Name" value={inviteName} onChange={e => setInviteName(e.target.value)} />
+            <input className="mx-input flex-1 text-xs" placeholder="Email" type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
+            <button onClick={handleInvite} disabled={isPending} className="btn btn-primary text-xs">Add</button>
+            <button onClick={() => setShowInvite(false)} className="btn btn-ghost text-xs">Cancel</button>
           </div>
         ) : (
           <div className="px-5 py-3">
-            <button onClick={() => setShowInvite(true)} className="btn btn-ghost text-xs">
-              + Invite Team Member
-            </button>
+            <button onClick={() => setShowInvite(true)} className="btn btn-ghost text-xs">+ Invite Team Member</button>
           </div>
         )}
       </Section>
