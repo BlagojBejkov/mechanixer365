@@ -207,10 +207,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               ) : (
                 <div className="space-y-1.5">
                   {(project.files ?? []).map((f: any) => (
-                    <div key={f.id} className="flex items-center gap-2 p-2 rounded hover:bg-mx-muted cursor-pointer">
+                    <a key={f.id} href={f.url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-2 rounded hover:bg-mx-muted transition-colors group">
                       <FileDown size={12} className="text-mx-accent flex-shrink-0" />
-                      <p className="text-2xs text-mx-light truncate flex-1">{f.name}</p>
-                    </div>
+                      <span className="text-2xs text-mx-light truncate flex-1 group-hover:text-mx-accent transition-colors">{f.name}</span>
+                      {f.size && <span className="text-2xs text-mx-subtle flex-shrink-0">{(f.size / 1024).toFixed(0)}KB</span>}
+                    </a>
                   ))}
                 </div>
               )}
