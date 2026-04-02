@@ -1,20 +1,3 @@
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
-import { relations } from 'drizzle-orm'
-import { createId } from '@paralleldrive/cuid2'
-
-// ─────────────────────────────────────────────
-// USERS (internal team)
-// ─────────────────────────────────────────────
-export const users = sqliteTable('users', {
-  id:        text('id').primaryKey().$defaultFn(() => createId()),
-  email:     text('email').notNull().unique(),
-  name:      text('name').notNull(),
-  role:      text('role', { enum: ['owner', 'engineer'] }).notNull().default('engineer'),
-  avatarUrl: text('avatar_url'),
-  passwordHash: text('password_hash'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-})
 import { relations } from 'drizzle-orm'
 import { createId } from '@paralleldrive/cuid2'
 
