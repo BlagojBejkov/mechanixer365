@@ -8,7 +8,7 @@ import { createHash } from 'crypto'
 
 export async function updateUserRate(userId: string, rate: number) {
   await db.update(users)
-    .set({ updatedAt: new Date() })
+    .set({ billableRate: rate, updatedAt: new Date() })
     .where(eq(users.id, userId))
   revalidatePath('/settings')
   return { success: true }
