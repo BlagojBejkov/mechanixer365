@@ -1,13 +1,8 @@
 'use client'
-
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { FileDown, Send, CheckCircle2, ChevronDown, Loader2 } from 'lucide-react'
 import { markInvoiceSent, markInvoicePaid } from '@/lib/actions/finance'
-async function handleExportPDF() {
-  const { generateInvoicePDF } = await import('@/lib/utils/pdf')
-  // ... rest of function
-}
 
 interface InvoiceData {
   id: string
@@ -48,6 +43,7 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
     setMenuOpen(false)
     setPdfLoading(true)
     try {
+      const { generateInvoicePDF } = await import('@/lib/utils/pdf')
       await generateInvoicePDF({
         number: invoice.number,
         title: invoice.title,
@@ -85,21 +81,16 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
 
   return (
     <div className="relative flex items-center gap-2">
-      {/* PDF export — always available */}
       <button
         onClick={handleExportPDF}
         disabled={pdfLoading}
         className="btn btn-ghost text-xs"
         title="Export as PDF"
       >
-        {pdfLoading
-          ? <Loader2 size={14} className="animate-spin" />
-          : <FileDown size={14} />
-        }
+        {pdfLoading ? <Loader2 size={14} className="animate-spin" /> : <FileDown size={14} />}
         {pdfLoading ? 'Generating…' : 'Export PDF'}
       </button>
 
-      {/* Status actions dropdown */}
       {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
         <div className="relative">
           <button
@@ -112,7 +103,6 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
               : <>Actions <ChevronDown size={12} /></>
             }
           </button>
-
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
@@ -138,17 +128,6 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
                     Mark as Paid
                   </button>
                 )}
-                {invoice.status === 'draft' && (
-                  <button
-                    onClick={handleExportPDF}
-                    disabled={pdfLoading}
-                    className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-mx-muted text-xs text-mx-dim transition-colors border-t"
-                    style={{ borderColor: '#2A2A32' }}
-                  >
-                    <FileDown size={13} className="text-mx-mid flex-shrink-0" />
-                    Export PDF
-                  </button>
-                )}
               </div>
             </>
           )}
@@ -157,8 +136,7 @@ export default function InvoiceActions({ invoice }: { invoice: InvoiceData }) {
 
       {invoice.status === 'paid' && (
         <span className="flex items-center gap-1.5 text-xs font-medium text-green-400">
-          <CheckCircle2 size={14} />
-          Paid
+          <CheckCircle2 size={14} /> Paid
         </span>
       )}
     </div>
