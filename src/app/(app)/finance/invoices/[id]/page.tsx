@@ -5,13 +5,12 @@ import { getInvoice } from '@/lib/db/queries'
 import PageHeader from '@/components/layout/PageHeader'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import dynamic from 'next/dynamic'
-const InvoiceActions = dynamic(() => import('@/components/finance/InvoiceActions'), { ssr: false })
+import InvoiceActions from '@/components/finance/InvoiceActions'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Invoice' }
-export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAuth()
