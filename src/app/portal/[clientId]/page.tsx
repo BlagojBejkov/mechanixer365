@@ -5,8 +5,10 @@ import type { Metadata } from 'next'
 import ProgressBar from '@/components/ui/ProgressBar'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { FileDown, CheckCircle2, Clock, Receipt, MessageSquare } from 'lucide-react'
+import { FileDown, CheckCircle2, Clock, MessageSquare } from 'lucide-react'
 import { getPortalData } from '@/lib/db/queries'
+
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ clientId: string }> }): Promise<Metadata> {
   const { clientId } = await params
