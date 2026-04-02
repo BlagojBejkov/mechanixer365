@@ -1,5 +1,3 @@
-'use client'
-
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface InvoicePDFData {
