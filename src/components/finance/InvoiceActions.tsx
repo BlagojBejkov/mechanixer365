@@ -4,7 +4,10 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { FileDown, Send, CheckCircle2, ChevronDown, Loader2 } from 'lucide-react'
 import { markInvoiceSent, markInvoicePaid } from '@/lib/actions/finance'
-import { generateInvoicePDF } from '@/lib/utils/pdf'
+async function handleExportPDF() {
+  const { generateInvoicePDF } = await import('@/lib/utils/pdf')
+  // ... rest of function
+}
 
 interface InvoiceData {
   id: string
