@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['jspdf', 'jspdf-autotable'],
   typescript: {
     ignoreBuildErrors: true,
   },
