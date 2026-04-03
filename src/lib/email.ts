@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 // The "from" address — must be a verified domain in Resend.
 // Using onboarding@resend.dev works for testing without a verified domain.
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'Mechanixer 365 <onboarding@resend.dev>'
@@ -19,6 +17,7 @@ export interface OverdueInvoiceEmailProps {
 }
 
 export async function sendOverdueInvoiceEmail(props: OverdueInvoiceEmailProps) {
+    const resend = new Resend(process.env.RESEND_API_KEY)
   const {
     to, clientName, invoiceNumber, invoiceTitle,
     total, currency, dueDate, daysOverdue, invoiceUrl
