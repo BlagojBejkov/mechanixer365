@@ -30,34 +30,6 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               <ArrowLeft size={14} /> Back
             </Link>
             <StatusBadge status={invoice.status} />
-            <InvoiceActions invoice={{
-              id:        invoice.id,
-              number:    invoice.number,
-              title:     invoice.title,
-              status:    invoice.status,
-              issueDate: invoice.issueDate,
-              dueDate:   invoice.dueDate,
-              currency:  invoice.currency ?? 'EUR',
-              subtotal:  invoice.subtotal,
-              tax:       invoice.tax ?? 0,
-              total:     invoice.total,
-              notes:     invoice.notes ?? undefined,
-              terms:     invoice.terms ?? undefined,
-              client: {
-                companyName:   invoice.client?.companyName ?? '',
-                contactName:   invoice.client?.contactName ?? '',
-                contactEmail:  invoice.client?.contactEmail ?? '',
-                billingAddress: invoice.client?.billingAddress ?? undefined,
-                vatNumber:     invoice.client?.vatNumber ?? undefined,
-              },
-              lineItems: invoice.lineItems.map(li => ({
-                description: li.description,
-                quantity:    li.quantity,
-                unit:        li.unit ?? 'hours',
-                unitPrice:   li.unitPrice,
-                total:       li.total,
-              })),
-            }} />
           </div>
         }
       />
